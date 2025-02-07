@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{% block title %}Enter your calculation{% endblock %}</h1>
+    <form>
+        <label for="x">X:</label><br>
+        <input type="text" id="x" name="x"><br> 
+        <label for="y">Y:</label><br>
+        <input type="text" id="y" name="y"><br>
+        <button>Add</button><button>Subtract</button><button>Divide</button><button>Multiply</button><button>Power</button>
+
+        <div class = "answer"></div>
+    </form>
+{% endblock %}
