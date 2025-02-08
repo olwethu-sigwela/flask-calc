@@ -170,7 +170,7 @@ def do_calc():
         "pow": Calc.pow
     }
 
-    calc = ops[op]
+    calc = ops[op](x, y)
 
 
  
