@@ -1,7 +1,13 @@
-from flask import Flask, jsonify, request, make_response, render_template
+import sqlite3
+from flask import Flask, jsonify, request, make_response, render_template, url_for, flash, redirect
 from flask_cors import CORS
 from urllib.parse import urlparse
+from werkzeug.exceptions import abort
 
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 class Calc:
     
@@ -29,7 +35,7 @@ class Calc:
         return "ZeroDivisionError"
     
 app = Flask(__name__)
-
+app.config["SECRET_KEY"] = "-6003720880522251805"
 @app.route('/add', methods = ['POST'])
 def add():
     values = request.get_json()
@@ -131,59 +137,90 @@ def pow():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    conn = get_db_connection()
+    calcs = conn.execute('SELECT * FROM calcs').fetchall()
+    conn.close()
+    return render_template("index.html", calcs=calcs)
 
 
-@app.route("/calc")
-def calc():
-    return render_template("calc.html")
+# @app.route("/calc")
+# def calc():
+#     return render_template("calc.html")
 
-@app.route("/do_calc" , methods = ['POST'])
+@app.route("/calc" , methods = ['GET', 'POST'])
 def do_calc():
 
-    # print(f"request={request}")
-    # print(f"request.get_data() = {request.get_data(as_text=True)}")
-    # print(f"type(request.get_data()) = {type(request.get_data(as_text=True))}")
-    # print(f"request.get_data().split('\\n') = {request.get_data(as_text=True).split("\n")}")
 
-    data = request.get_data(as_text=True).split("\n")
-    x = int(data[3])
-    y = int(data[7])
-    op = data[11].strip("\r")
+    if request.method == "POST":
+        # print(f"request={request}")
+        # print(f"request.get_data() = {request.get_data(as_text=True)}")
+        # print(f"type(request.get_data()) = {type(request.get_data(as_text=True))}")
+        # print(f"request.get_data().split('\\n') = {request.get_data(as_text=True).split("\n")}")
 
-    # print(f"x = {x}")
-    # print(f"y = {y}")
-    # print(f"op = {op}")
-    # print(f"x == 3 = {x == 3}")
-    # print(f"y == 5 = {y == 5}")
-    # print(f"op == 'div' = {op == "div"}")
+        data = request.get_data(as_text=True).split("\n")
+        x = int(request.form["x"])
+        y = int(request.form["y"])
+        op = request.form["operation"]
 
-    # values = request.get_json()
+        if not(x and y and op):
+            flash("Missing data!")
+        else:
 
-    # print(f"values = {values}")
+            # print(f"x = {x}")
+            # print(f"y = {y}")
+            # print(f"op = {op}")
+            # print(f"x == 3 = {x == 3}")
+            # print(f"y == 5 = {y == 5}")
+            # print(f"op == 'div' = {op == "div"}")
 
-    ops = {
-        "add": Calc.add,
-        "sub": Calc.sub,
-        "mul": Calc.mul,
-        "div": Calc.div,
-        "pow": Calc.pow
-    }
+            # values = request.get_json()
 
-    calc = ops[op](x, y)
+            # print(f"values = {values}")
+
+            ops = {
+                "add": Calc.add,
+                "sub": Calc.sub,
+                "mul": Calc.mul,
+                "div": Calc.div,
+                "pow": Calc.pow
+            }
 
 
- 
-    response = {
-        "answer":calc
-    }
 
-    if calc != "ZeroDivisionError":
-        response["message"] = "Calculation successful"
-    else:
-        response["message"] = "Calculation failed"
+            calc = ops[op](x, y)
 
-    return response
+            full_op_names = {
+                "add": "Add",
+                "sub": "Subtract",
+                "mul": "Multiply",
+                "div": "Divide",
+                "pow": "Power"
+            }
+
+            conn = get_db_connection()
+
+            conn.execute("INSERT INTO calcs (x, y, operation, answer) VALUES (?, ?, ?, ?)", 
+                         (x, y, full_op_names[op], float(calc)))
+            
+            conn.commit()
+            conn.close()
+            
+
+
+
+        
+            response = {
+                "answer":calc
+            }
+
+            if calc != "ZeroDivisionError":
+                response["message"] = "Calculation successful"
+            else:
+                response["message"] = "Calculation failed"
+
+            return response
+
+    return render_template("calc.html")
 
   
 

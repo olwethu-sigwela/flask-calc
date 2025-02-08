@@ -2,18 +2,20 @@
 
 {% block content %}
     <h1>{% block title %}Enter your calculation{% endblock %}</h1>
-    <form action="/do_calc" method="post" enctype="multipart/form-data">
+    <form method="post">
+        
         <label for="x">X:</label><br>
-        <input type="text" id="x" name="x"><br> 
+        <input type="text" id="x" name="x" value = "{{ request.form['x'] }}"><br> 
         <label for="y">Y:</label><br>
-        <input type="text" id="y" name="y"><br>
+        <input type="text" id="y" name="y" value = "{{ request.form['y'] }}"><br>
         <input type="radio" id="add" name="operation" value = "add"><label for="add">Add</label><br>
         <input type="radio" id="sub" name="operation" value = "sub"><label for="sub">Subtract</label><br>
         <input type="radio" id="mul" name="operation" value = "mul"><label for="mul">Multiply</label><br>
         <input type="radio" id="div" name="operation" value = "div"><label for="div">Divide</label><br>
         <input type="radio" id="pow" name="operation" value = "pow"><label for="pow">Power</label><br>
         <!-- <button>Calculate</button> -->
-         <input type= "submit" value = "Calculate!">
+        
+        <input type= "submit" value = "Calculate!">
         <div class = "answer"></div>
     </form>
 {% endblock %}
