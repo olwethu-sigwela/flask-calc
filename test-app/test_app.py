@@ -138,6 +138,55 @@ def index():
 def calc():
     return render_template("calc.html")
 
+@app.route("/do_calc" , methods = ['POST'])
+def do_calc():
+
+    # print(f"request={request}")
+    # print(f"request.get_data() = {request.get_data(as_text=True)}")
+    # print(f"type(request.get_data()) = {type(request.get_data(as_text=True))}")
+    # print(f"request.get_data().split('\\n') = {request.get_data(as_text=True).split("\n")}")
+
+    data = request.get_data(as_text=True).split("\n")
+    x = int(data[3])
+    y = int(data[7])
+    op = data[11].strip("\r")
+
+    # print(f"x = {x}")
+    # print(f"y = {y}")
+    # print(f"op = {op}")
+    # print(f"x == 3 = {x == 3}")
+    # print(f"y == 5 = {y == 5}")
+    # print(f"op == 'div' = {op == "div"}")
+
+    # values = request.get_json()
+
+    # print(f"values = {values}")
+
+    ops = {
+        "add": Calc.add,
+        "sub": Calc.sub,
+        "mul": Calc.mul,
+        "div": Calc.div,
+        "pow": Calc.pow
+    }
+
+    calc = ops[op]
+
+
+ 
+    response = {
+        "answer":calc
+    }
+
+    if calc != "ZeroDivisionError":
+        response["message"] = "Calculation successful"
+    else:
+        response["message"] = "Calculation failed"
+
+    return response
+
+  
+
 
   
 

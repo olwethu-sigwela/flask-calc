@@ -2,13 +2,18 @@
 
 {% block content %}
     <h1>{% block title %}Enter your calculation{% endblock %}</h1>
-    <form>
+    <form action="/do_calc" method="post" enctype="multipart/form-data">
         <label for="x">X:</label><br>
         <input type="text" id="x" name="x"><br> 
         <label for="y">Y:</label><br>
         <input type="text" id="y" name="y"><br>
-        <button>Add</button><button>Subtract</button><button>Divide</button><button>Multiply</button><button>Power</button>
-
+        <input type="radio" id="add" name="operation" value = "add"><label for="add">Add</label><br>
+        <input type="radio" id="sub" name="operation" value = "sub"><label for="sub">Subtract</label><br>
+        <input type="radio" id="mul" name="operation" value = "mul"><label for="mul">Multiply</label><br>
+        <input type="radio" id="div" name="operation" value = "div"><label for="div">Divide</label><br>
+        <input type="radio" id="pow" name="operation" value = "pow"><label for="pow">Power</label><br>
+        <!-- <button>Calculate</button> -->
+         <input type= "submit" value = "Calculate!">
         <div class = "answer"></div>
     </form>
 {% endblock %}
